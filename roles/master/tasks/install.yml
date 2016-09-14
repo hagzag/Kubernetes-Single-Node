@@ -1,0 +1,19 @@
+---
+
+- include: ubuntu-14.04.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 15
+
+- name: Retrieve systemd files for github-release kube_source_type type
+  include: retrieve-systemd-files.yml
+  when: kube_source_type == "github-release" or (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int == 16)
+
+# Change default value of kube_source_type
+- name: Force kube_source_type to github
+  set_fact:
+    kube_source_type: "github-release"
+  when: ansible_distribution == 'Ubuntu'
+
+- include: download_bins.yml
+  when: kube_source_type == "github-release"
+  tags:
+    - binary-update

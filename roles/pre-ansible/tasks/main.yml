@@ -1,0 +1,37 @@
+---
+
+- name: "Install required packages"
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    force: yes
+    update_cache: yes
+  with_items:
+  - python-netaddr
+
+- name: Get os_version from /etc/os-release
+  raw: "grep '^VERSION_ID=' /etc/os-release | sed s'/VERSION_ID=//'"
+  register: os_version
+  always_run: yes
+
+- name: Get distro name from /etc/os-release
+  raw: "grep '^NAME=' /etc/os-release | sed s'/NAME=//'"
+  register: distro
+  always_run: yes
+
+- name: Init the is_coreos fact
+  set_fact:
+    is_coreos: false
+
+- name: Set the is_coreos fact
+  set_fact:
+    is_coreos: true
+  when: "'CoreOS' in distro.stdout"
+
+- name: Determine if Atomic
+  raw: "test -f /run/ostree-booted"
+  register: s
+  changed_when: false
+  failed_when: false
+  always_run: yes
+
