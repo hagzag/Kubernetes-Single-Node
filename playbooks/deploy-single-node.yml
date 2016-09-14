@@ -18,11 +18,11 @@
 
 # install flannel
 - hosts:
-    - masters
-    - nodes
+  - masters
+  - nodes
   become: yes
   roles:
-    flannel
+  - flannel
   tags:
     - network-service-install
 
