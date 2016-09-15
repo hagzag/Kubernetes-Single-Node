@@ -1,67 +1,16 @@
---- 
+---
+- name: Install etcd
+  include: install.yml
+  tags: install
 
-- name: "Force etcd_source_type to github when packages are not available"
-  set_fact:
-    etcd_source_type: "github-release"
+- name: Configure etcd
+  include: configure.yml
+  tags: configure
 
-- name: "Download tar file"
-  get_url:
-    url: "{{ etcd_download_url }}"
-    dest: "{{ ansible_temp_dir }}"
-    validate_certs: False
-  environment:
-    http_proxy: "{{ http_proxy|default('') }}"
-    https_proxy: "{{ https_proxy|default('') }}"
-    no_proxy: "{{ no_proxy|default('') }}"
+- name: Start etcd
+  include: start.yml
 
-- name: "Extract tar file"
-  unarchive:
-    src: "{{ ansible_temp_dir }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
-    dest: /usr/local
-    copy: no
-
-- name: "Create symlinks"
-  file:
-    src: /usr/local/etcd-v{{ etcd_version }}-linux-amd64/{{ item }}
-    dest: /usr/bin/{{ item }}
-    state: link
-  with_items:
-  - etcd
-  - etcdctl
-
-- name: "Create upstart script"
-  copy: 
-   src: etcd.upstart 
-   dest: /etc/init/etcd.conf
-
-- name: "Create etcd config directory"
-  file: 
-   path: "{{ etcd_conf_dir }}" 
-   state: directory
-
-- name: "Write etcd config file"
-  template: 
-   src: etcd.conf.j2 
-   dest: /etc/etcd/etcd.conf
-
-- name : "Setting the etcd_modified fact to true"
-  set_fact:
-    etcd_modified: true
-
-- name: "Enable etcd"
-  service: 
-   name: etcd 
-   enabled: yes
-  when: etcd_enable == true
-
-- name: "Start etcd"
-  service: 
-   name: etcd 
-   state: started
-  register: etcd_started
-
-- name: "restart etcd"
-  service: 
-   name: etcd 
-   state: restarted
-
+- name: Restart etcd
+  include: restart.yml
+  when: etcd_modified is not defined or (etcd_modified is defined and etcd_started.changed == false)
+  tags: restart

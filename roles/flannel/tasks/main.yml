@@ -1,149 +1,25 @@
 ---
+- name: Prepare and write Flannel configuration to etcd
+  include: config.yml
 
-# Prepare and write Flannel configuration to etcd.
+- name: Install Flannel
+  include: client.yml
+  when: inventory_hostname in groups['masters'] + groups['nodes']
 
-- name: "Set facts about etcdctl command"
-  set_fact:
-    peers: "{% for hostname in groups['etcd'] %}http://{{ hostname }}:2379{% if not loop.last %},{% endif %}{% endfor %}"
-    conf_file: "/tmp/flannel-conf.json"
-    conf_loc: "/{{ cluster_name }}/network/config"
-  run_once: true
-  delegate_to: "{{ groups['etcd'][0] }}"
+- include: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
 
-- name: "Create flannel config file to go in etcd"
-  template: 
-   src: "flannel-conf.json.j2" 
-   dest: "{{ conf_file }}"
-  run_once: true
-  delegate_to: "{{ groups['etcd'][0] }}"
+- include: firewalld.yml
+  when: has_firewalld
 
-- name: "Load the flannel config file into etcd"
-  shell: "/usr/bin/etcdctl --no-sync --peers={{ peers }} set {{ conf_loc }} < {{ conf_file }}"
-  run_once: true
-  delegate_to: "{{ groups['etcd'][0] }}"
+- include: iptables.yml
+  when: not has_firewalld and has_iptables
 
-- name: "Clean up the flannel config file"
-  file: 
-   path: "/tmp/flannel-config.json" 
-   state: absent
-  run_once: true
-  delegate_to: "{{ groups['etcd'][0] }}"
-
-- name: "Force to use github-release when packages are not available"
-  set_fact:
-    flannel_source_type: "github-release"
-
-- name: "Set upstart fact as false"
-  set_fact:
-    flannel_use_upstart: false
-
-- name: "Set upstart fact as true in older versions of Ubuntu"
-  set_fact:
-    flannel_use_upstart: true
-  when:  "{{ ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 15 }}"
-
-- name: "Retrieves facts for a pth of the flannel"
-  stat: path={{ flannel_releases_dir }}/flannel-{{ flannel_version }}
-  register: st
-
-- name: "Create symlinks"
-  file:
-    src: "{{ flannel_releases_dir }}/flannel-{{ flannel_version }}/{{ item }}"
-    dest: "{{ bin_dir }}/{{ item }}"
-    state: link
-    force: yes
-  with_items:
-  - flanneld
-  - mk-docker-opts.sh
-
-# Write upstart Flannel configuration.
-# On non-github-release service files must be provided by flannel package.
-
-- assert:
-    that:
-      - flannel_source_type == "github-release"
-  when: flannel_use_upstart == true
-
-- name: "Create Upstart Script"
-  template: 
-   src: "flanneld.upstart" 
-   dest: "/etc/init/flanneld.conf"
-  when: flannel_use_upstart == true
-
-# Write systemd Flannel configuration.
-# On non-github-release service files must be provided by flannel package.
-
-- assert:
-    that:
-      - flannel_source_type == "github-release"
-  when: flannel_use_upstart == false
-
-- name: "Add Flanneld Systemd Unit File"
-  template: 
-   src: "flanneld.service" 
-   dest: "/etc/systemd/system/flanneld.service"
-  register: flanneld_service
-  notify:
-  - reload systemd
-  when: flannel_use_upstart == false
-
-- name: "Create Docker systemd dropin directory"
-  file: 
-   path: "/etc/systemd/system/docker.service.d" 
-   state: directory
-  when: flannel_use_upstart == false
-
-- name: "Add Docker drop-in with dependency on Flannel"
-  copy: 
-   src: "40-docker-depends-on-flannel.conf" 
-   dest: "/etc/systemd/system/docker.service.d/40-docker-depends-on-flannel.conf"
-  notify:
-    - reload systemd
-  when: flannel_use_upstart == false
-
-- name: "Set Flannel config file directory"
-  set_fact:
-    flannel_config_dir: "/etc/sysconfig"
-
-- name: "Override Flannel config file directory for Ubuntu"
-  set_fact:
-    flannel_config_dir: "/etc/flannel"
-  when: flannel_use_upstart
-
-- name: "Create config file directory"
-  file: 
-   path: "{{ flannel_config_dir }}"
-   state: directory
-
-- name: "Install Flannel config file"
-  template: 
-   src: "flanneld.j2" 
-   dest: "{{ flannel_config_dir }}/flanneld"
-  notify:
-  - restart flannel
-
-- name: "Configure Docker to use Flannel network"
-  lineinfile:
-       dest: "{{ docker_config_dir }}/docker"
-       state: present
-       line: "{{ item.line }}"
-       regexp: "{{ item.regexp }}"
-  with_items:
-  - { line: '. /run/flannel/subnet.env', regexp: '. /run/flannel/subnet.env' }
-  - { line: 'DOCKER_OPTS="--bip ${FLANNEL_SUBNET} --mtu ${FLANNEL_MTU}"',regexp: '^DOCKER_OPTS=' }
-  when: ansible_distribution_major_version|int < 15
-  notify:
-  - restart flannel
-
-- name: "Enable flannel"
-  service: 
-   name: flanneld 
-   enabled: yes
+- name: Enable flannel
+  service: name=flanneld enabled=yes
 
 - name: Start flannel
-  service: 
-   name: flanneld 
-   state: started
+  service: name=flanneld state=started
   register: flannel_started
   notify:
     - restart docker

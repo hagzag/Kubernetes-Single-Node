@@ -1,8 +1,6 @@
 ---
-
 - name: reload systemd
   command: systemctl --system daemon-reload
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int == 15
-  
+
 - name: Save iptables rules
   command: service iptables save

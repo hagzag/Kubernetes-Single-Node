@@ -1,5 +1,4 @@
 ---
-
 - name: Get Systemd unit files from Kubernetes repository
   get_url:
     url=https://raw.githubusercontent.com/kubernetes/contrib/master/init/systemd/{{ item }}.service

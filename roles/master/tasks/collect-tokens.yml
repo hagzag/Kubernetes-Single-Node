@@ -1,5 +1,4 @@
 ---
-
 - name: Get the master token values
   slurp:
     src: "{{ kube_token_dir }}/{{ item }}-{{ inventory_hostname }}.token"

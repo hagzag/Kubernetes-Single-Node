@@ -1,5 +1,4 @@
 ---
-
 - name: Create the kubelet working directory
   file: path={{ kubelet_working_dir }} state=directory
 

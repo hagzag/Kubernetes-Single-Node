@@ -36,6 +36,7 @@ function kubernetes_single_node() {
   if [ ! -d "/opt/install" ]; then
     mkdir /opt/install
     cd /opt/install && git clone https://github.com/niso120b/Kubernetes-Single-Node.git .
+    cd /opt/install/scripts && ./deploy-local-cluster.sh
   else
     echo "*** Error to deploy a kubernetes on single node server /etc/install exists" && exit 1
   fi
