@@ -1,8 +1,8 @@
 # Kubernetes-Single-Node
 
 Ansible Deploy By :  
- Nissim Bitan
- Niv Azriel 
+ - Nissim Bitan
+ - Niv Azriel 
 
 TO RUN:
 
