@@ -1,0 +1,89 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Create instance in openstack environment that run
+  ansible playbook to install kubernetres on it,
+  Kubernetes in single mode architecture.
+
+parameters:
+  server_name:
+    type: string
+    description: Name of the kube server 
+
+resources:
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: server_name }
+      image: "trusty-server-cloudimg-amd64-disk1.img"
+      flavor: m1.small
+      key_name: kp-admin-1473592989
+      networks:
+        - port: { get_resource: server_port }
+      user_data:
+        #!/bin/sh -x
+        # 
+        # Copyright 2016 
+        # nissim bitan 
+        # niv azriel
+        LOG_FILE=/var/log/k8s-singlenode-install.log
+        ANSIBLE_PKG=/ansible_2.1.1.0-1ppa~trusty_all.deb
+        #ANSIBLE_PKG=/opt/ansible_1.9.6-1ppa~trusty_all.deb
+        #ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible-1.9/+files/ansible_1.9.6-1ppa~trusty_all.deb
+        ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible/+files/ansible_2.1.1.0-1ppa~trusty_all.deb
+
+        function validate_ansible_reqs() {
+          for pkg in sshpass python-netaddr python-yaml python-support python-jinja2 python-paramiko python-markupsafe;
+          do
+            is_package_installed ${pkg} || install_package ${pkg}
+            is_package_installed ${pkg} || (echo "Error installing packages '${pkg}'" && exit 2)
+          done
+        }
+  
+        function install_ansible() {
+          echo "Installing Ansible" | tee -a ${LOG_FILE}
+          validate_ansible_reqs
+          [ ! -f $ANSIBLE_PKG ] && wget --continue $ANSIBLE_URL -O $ANSIBLE_PKG
+          dpkg -i $ANSIBLE_PKG
+          apt-get -f install --yes --force-yes
+          [ $(ansible --version | grep 1\.9\.4 | wc -l) != 1 ] && echo "*** Error while installing Ansible, aborting execution." && exit 1
+          echo "Installed Ansible version: $(ansible --version)"
+        }
+    
+        function kubernetes_single_node() {
+          set -x
+          install_ansible
+          echo "Installing kubernetes single node from git"
+          if [ ! -d "/opt/install" ]; then
+            mkdir /opt/install
+            cd /opt/install && git clone https://github.com/niso120b/Kubernetes-Single-Node.git .
+            cd /opt/install/scripts && ./deploy-local-cluster.sh
+          else
+            echo "*** Error to deploy a kubernetes on single node server /etc/install exists" && exit 1
+          fi
+        }
+        # Log all output to file.
+        kubernetes_single_node 2>&1 | tee -a ${LOG_FILE}
+      user_data_format: RAW
+
+  server_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: 17e6b15b-84a0-484b-a6dd-f926e6610930
+      fixed_ips:
+        - subnet_id: 16556461-55e4-420e-9195-35db890d8f49
+      security_groups: [ 0e254744-c5d5-430e-8aa5-8bfbf7ae6349 ]
+
+  server_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: 5cc7626f-5adb-4c22-a9d1-4e0b83b7d28f
+      port_id: { get_resource: server_port }
+
+outputs:
+  server_private_ip:
+    description: IP address of server in private network
+    value: { get_attr: [ server, first_address ] }
+  server_public_ip:
+    description: Floating IP address of server in public network
+    value: { get_attr: [ server_floating_ip, floating_ip_address ] }

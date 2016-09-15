@@ -6,4 +6,13 @@ Ansible Deploy By :
 
 TO RUN:
 
-cd scripts/ && ./deploy-local-cluster.sh
+without flannel - 
+	cd scripts/ && ./deploy-local-cluster.sh
+
+with flannel -
+	cd script/ && ./deploy-cluster.sh
+
+
+in local cluser (single node) you dont need flannel
+
+

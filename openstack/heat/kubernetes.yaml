@@ -27,9 +27,8 @@ resources:
       network_id: 17e6b15b-84a0-484b-a6dd-f926e6610930
       fixed_ips:
         - subnet_id: 16556461-55e4-420e-9195-35db890d8f49
-      security_groups:
-        - admin-security-group
-
+      security_groups: [ 0e254744-c5d5-430e-8aa5-8bfbf7ae6349 ]
+      
   server_floating_ip:
     type: OS::Neutron::FloatingIP
     properties:
