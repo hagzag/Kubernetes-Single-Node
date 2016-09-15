@@ -20,7 +20,7 @@ resources:
       key_name: kp-admin-1473592989
       networks:
         - port: { get_resource: server_port }
-      user_data:
+      user_data: |
         #!/bin/sh -x
         # 
         # Copyright 2016 
