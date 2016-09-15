@@ -24,7 +24,7 @@ function install_ansible() {
   [ ! -f $ANSIBLE_PKG ] && wget --continue $ANSIBLE_URL -O $ANSIBLE_PKG
   dpkg -i $ANSIBLE_PKG
   apt-get -f install --yes --force-yes
-  [ $(ansible --version | grep 1\.9\.4 | wc -l) != 1 ] && echo "*** Error while installing Ansible, aborting execution." && exit 1
+  [ $(ansible --version | grep 2\.1\.1\.0 | wc -l) != 1 ] && echo "*** Error while installing Ansible, aborting execution." && exit 1
   echo "Installed Ansible version: $(ansible --version)"
 }
 
@@ -35,6 +35,7 @@ function kubernetes_single_node() {
   echo "Installing kubernetes single node from git"
   if [ ! -d "/opt/install" ]; then
     mkdir /opt/install
+    apt-get update && apt-get install git -y
     cd /opt/install && git clone https://github.com/niso120b/Kubernetes-Single-Node.git .
     cd /opt/install/scripts && ./deploy-local-cluster.sh
   else
