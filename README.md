@@ -7,12 +7,12 @@ Ansible Deploy By :
 TO RUN:
 
 without flannel - 
-	cd scripts/ && ./deploy-local-cluster.sh
+# cd scripts/ && ./deploy-local-cluster.sh
 
 with flannel -
-	cd script/ && ./deploy-cluster.sh
+# cd script/ && ./deploy-cluster.sh
 
-
+Tips: 
 in local cluser (single node) you dont need flannel
 
 
