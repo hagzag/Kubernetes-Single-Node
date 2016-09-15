@@ -9,29 +9,33 @@
   with_items:
   - python-netaddr
 
-- name: Get os_version from /etc/os-release
+- name: "Get os_version from /etc/os-release"
   raw: "grep '^VERSION_ID=' /etc/os-release | sed s'/VERSION_ID=//'"
   register: os_version
   always_run: yes
 
-- name: Get distro name from /etc/os-release
+- name: "Get distro name from /etc/os-release"
   raw: "grep '^NAME=' /etc/os-release | sed s'/NAME=//'"
   register: distro
   always_run: yes
 
-- name: Init the is_coreos fact
+- name: "Init the is_coreos fact"
   set_fact:
     is_coreos: false
 
-- name: Set the is_coreos fact
+- name: "Set the bin directory path for CoreOS"
   set_fact:
-    is_coreos: true
-  when: "'CoreOS' in distro.stdout"
+    bin_dir: "/opt/bin"
+  when: is_coreos
 
-- name: Determine if Atomic
+- name: "Determine if Atomic"
   raw: "test -f /run/ostree-booted"
   register: s
   changed_when: false
   failed_when: false
   always_run: yes
 
+- name: "Set the is_atomic fact"
+  set_fact:
+    is_atomic: true
+  when: s.rc == 0

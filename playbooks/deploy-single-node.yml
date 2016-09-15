@@ -18,8 +18,8 @@
 
 # install flannel
 - hosts:
-  - masters
-  - nodes
+    - masters
+    - nodes
   become: yes
   roles:
   - flannel

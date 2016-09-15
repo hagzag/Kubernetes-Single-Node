@@ -1,0 +1,45 @@
+heat_template_version: 2013-05-23
+
+description: >
+  Create instance in openstack environment that run
+  ansible playbook to install kubernetres on it,
+  Kubernetes in single mode architecture.
+
+parameters:
+  server_name:
+    type: string
+    description: Name of the kube server 
+
+resources:
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: server_name }
+      image: "trusty-server-cloudimg-amd64-disk1.img"
+      flavor: m1.small
+      key_name: kp-admin-1473592989
+      networks:
+        - port: { get_resource: server_port }
+
+  server_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: 17e6b15b-84a0-484b-a6dd-f926e6610930
+      fixed_ips:
+        - subnet_id: 16556461-55e4-420e-9195-35db890d8f49
+      security_groups:
+        - admin-security-group
+
+  server_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: 5cc7626f-5adb-4c22-a9d1-4e0b83b7d28f
+      port_id: { get_resource: server_port }
+
+outputs:
+  server_private_ip:
+    description: IP address of server in private network
+    value: { get_attr: [ server, first_address ] }
+  server_public_ip:
+    description: Floating IP address of server in public network
+    value: { get_attr: [ server_floating_ip, floating_ip_address ] }
