@@ -15,4 +15,4 @@ cd script/ && ./deploy-cluster.sh
 Tips: 
 in local cluser (single node) you dont need flannel
 
-
+![alt tag](kubernetessinglenode.jpg)
