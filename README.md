@@ -1,18 +1,24 @@
 # Kubernetes-Single-Node
 
-Ansible Deploy By :  
+**Ansible Deploy By** :  
  - Nissim Bitan
  - Niv Azriel 
 
-TO RUN:
+## To Run:
 
-# without flannel 
+### without flannel 
 cd scripts/ && ./deploy-local-cluster.sh
 
-# with flannel
+### with flannel
 cd script/ && ./deploy-cluster.sh
 
-Tips: 
+**Tips:**
 in local cluser (single node) you dont need flannel
 
+# Kubernetes single node architecture
+
 ![alt tag](kubernetessinglenode.jpg)
+
+# The deploy process
+
+![alt tag](deployprocess.jpg)
