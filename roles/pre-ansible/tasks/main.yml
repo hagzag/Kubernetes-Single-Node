@@ -1,14 +1,4 @@
 ---
-
-- name: "Install required packages"
-  apt:
-    pkg: "{{ item }}"
-    state: installed
-    force: yes
-    update_cache: yes
-  with_items:
-  - python-netaddr
-
 - name: Get os_version from /etc/os-release
   raw: "grep '^VERSION_ID=' /etc/os-release | sed s'/VERSION_ID=//'"
   register: os_version

@@ -10,6 +10,19 @@ ANSIBLE_PKG=/ansible_2.1.1.0-1ppa~trusty_all.deb
 #ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible-1.9/+files/ansible_1.9.6-1ppa~trusty_all.deb
 ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible/+files/ansible_2.1.1.0-1ppa~trusty_all.deb
 
+function install_package() {
+  echo "Installing package '${@}'" | tee -a ${LOG_FILE}
+  apt-get install "$@" -y --force-yes
+}
+
+function is_package_installed() {
+  echo "Verifying package '${@}' installation" | tee -a ${LOG_FILE}
+  [[ -z "$@" ]] && return 1
+
+  dpkg -l "$@" | grep ii > /dev/null
+  return $?
+}
+
 function validate_ansible_reqs() {
   for pkg in sshpass python-netaddr python-yaml python-support python-jinja2 python-paramiko python-markupsafe;
   do

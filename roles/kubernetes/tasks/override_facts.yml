@@ -10,8 +10,8 @@
 
 - name: Update facts if this is CoreOS or Ubuntu 14.04
   set_fact:
-    bin_dir: "/bin"
-    kube_script_dir: "/bin/kubernetes"
-    python_bin: "/bin/python"
+    bin_dir: "/opt/bin"
+    kube_script_dir: "/opt/bin/kubernetes"
+    python_bin: "/opt/bin/python"
   when: is_coreos or ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 15
 
