@@ -50,6 +50,7 @@ function kubernetes_single_node() {
     mkdir /opt/install
     apt-get update && apt-get install git -y
     cd /opt/install && git clone https://github.com/niso120b/Kubernetes-Single-Node.git .
+    cd /opt/Kubernetes-Single-Node/roles/kubernetes-addons/templates/ && ./get_templates.sh
     cd /opt/install/scripts && ./deploy-local-cluster.sh
     cp -prv /opt/bin/* /bin/
     kubectl create -f /etc/kubernetes/addons/kubernetes-dashboard/kubernetes-dashboard.yml
