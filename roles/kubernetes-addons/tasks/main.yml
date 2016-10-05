@@ -31,6 +31,9 @@
 - include: kube-dash.yml
   when: kube-dash
 
+- include: kubernetes-dashboard.yml
+  when: kubernetes-dashboard
+
 - name: Get kube-addons script from Kubernetes
   copy:
     src=common/kube-addons.sh

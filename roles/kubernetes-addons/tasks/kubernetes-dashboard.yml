@@ -1,0 +1,14 @@
+---
+- name: KUBERNETES-DASHBOARD | Assures {{ kube_addons_dir }}/kubernetes-dashboard dir exists
+  file: path={{ kube_addons_dir }}/kube-dash state=directory
+
+- name: KUBERNETES-DASHBOARD | Copy kubernetes-dashboard manifests to master
+  template:
+  args:
+    src: "kubernetes-dashboard/{{ item }}.j2"
+    dest: "{{ kube_addons_dir }}/kubernetes-dashboard/{{ item }}"
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - kubernetes-dashboard.yaml

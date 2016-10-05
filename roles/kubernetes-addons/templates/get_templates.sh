@@ -47,6 +47,14 @@ for filename in es-controller.yaml es-service.yaml kibana-controller.yaml kibana
     curl -Lfo ${filepath} "${github_url}/cluster/addons/fluentd-elasticsearch/${filename}"
 done
 
+# get kubernetes dashboard
+dir="kubernetes-dashboard"
+mkdir -p $dir
+for filename in kubernetes-dashboard.yaml; do
+    filepath="${dir}/${filename}.j2"
+    curl -Lfo ${filepath} "https://rawgit.com/kubernetes/dashboard/master/src/deploy/${filename}"
+done
+
 # get kube dash
 dir="kube-dash"
 mkdir -p $dir
