@@ -51,7 +51,8 @@ function kubernetes_single_node() {
     apt-get update && apt-get install git -y
     cd /opt/install && git clone https://github.com/niso120b/Kubernetes-Single-Node.git .
     cd /opt/install/scripts && ./deploy-local-cluster.sh
-    mv /opt/bin/* /bin/
+    cp -prv /opt/bin/* /bin/
+    kubectl create -f /etc/kubernetes/addons/kubernetes-dashboard/kubernetes-dashboard.yml
   else
     echo "*** Error to deploy a kubernetes on single node server /etc/install exists" && exit 1
   fi
