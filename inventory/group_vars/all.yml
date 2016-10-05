@@ -83,7 +83,7 @@ cluster_logging: true
 cluster_monitoring: true
 
 # Turn to false to disable the kube-ui addon for this cluster
-kube-ui: true
+kube-ui: false
 
 # Turn to false to disable the kube-dash addon for this cluster
 kube-dash: true
