@@ -1,10 +1,6 @@
 ---
 - name: KUBERNETES-DASHBOARD | Assures {{ kube_addons_dir }}/kubernetes-dashboard dir exists
-  file: path={{ kube_addons_dir }}/kube-dash state=directory
-
-- name: KUBERNETES-DASHBOARD | create directory of kubernetes-dashboard
-  shell:
-   mkdir "{{ kube_addons_dir }}/kubernetes-dashboard"
+  file: path={{ kube_addons_dir }}/kubernetes-dashboard state=directory
 
 - name: KUBERNETES-DASHBOARD | Copy kubernetes-dashboard manifests to master
   template:

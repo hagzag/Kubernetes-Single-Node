@@ -5,7 +5,7 @@
 # niv azriel
 
 LOG_FILE=/var/log/k8s-singlenode-install.log
-ANSIBLE_PKG=/ansible_2.1.1.0-1ppa~trusty_all.deb
+ANSIBLE_PKG=ansible_2.1.1.0-1ppa~trusty_all.deb
 #ANSIBLE_PKG=/opt/ansible_1.9.6-1ppa~trusty_all.deb
 #ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible-1.9/+files/ansible_1.9.6-1ppa~trusty_all.deb
 ANSIBLE_URL=https://launchpad.net/~ansible/+archive/ubuntu/ansible/+files/ansible_2.1.1.0-1ppa~trusty_all.deb
