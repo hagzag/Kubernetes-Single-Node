@@ -17,8 +17,8 @@ in local cluser (single node) you dont need flannel
 
 # Kubernetes single node architecture
 
-![alt tag](kubernetessinglenode.jpg)
+![alt tag](images/kubernetessinglenode.jpg)
 
 # The deploy process
 
-![alt tag](deployprocess.jpg)
+![alt tag](images/deployprocess.jpg)
